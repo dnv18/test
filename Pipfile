@@ -11,6 +11,8 @@ psycopg2-binary = "*"
 Flask-SQLAlchemy = "*"
 Flask-Migrate = "*"
 python-decouple = "*"
+flask-serialize = "*"
+flask-restless = "*"
 
 [dev-packages]
 

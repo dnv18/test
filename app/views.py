@@ -1,11 +1,12 @@
 import json
 
-from flask import request, Blueprint
+import flask_restless
+from flask import request, Blueprint, jsonify
+from sqlalchemy import select
 
-from .models import Team, Events, League, db, Teamleague
+from .models import Team, Events, League, db, TeamLeague, fs_mixin, Test, engine
 
 views = Blueprint('views', __name__)
-
 #
 # @views.route('/app', methods=['POST', 'GET'])
 # def test_getpost():
@@ -53,21 +54,37 @@ views = Blueprint('views', __name__)
 #         return {'message': 'Deleted'}
 
 
-@views.route('/join')
+@views.route('/join', methods=['GET'])
 def join():
     # rows = db.session.query(Test.id, Test1.field1_1).join(Test1, Test.id == Test1.tid).order_by(Test.id).all()
-    # rows = Events.join(League).select(Events.c.idevent == 467795).execute().first()
-    # rows = Events.join(League, onclause=Events.c.idleague == League.c.idleague).\
-    #     join(Team, onclause=Events.c.idhometeam == Team.c.idteam).\
+    # rows = Events.outerjoin(League).select(Events.c.idevent == 467795).execute().first()
+    # rows = Events.select(Events.c.idevent >= 1).execute().first()
+    rows = League.select().execute()
+    row = rows.fetchone()
+    print(row[League.c.idleague], row[1])
+
+    # rows = Events.join(League, onclause=Events.c.idleague == League.c.idleague). \
+    #     join(Team, onclause=Events.c.idhometeam == Team.c.idteam). \
     #     select().\
-    #     execute().first()
+    #     execute()
+    data = []
+    for row in rows:
+        d = dict(row.items())
+        data.append(d)
+    # return '1'
+    return jsonify({League.name: data[:10]})
 
-    rows = League.join(Teamleague, League.c.idleague == Teamleague.c.idleague).\
-        join(Team, Teamleague.c.idteam == Team.c.idteam).select().execute().all()
 
-    print({'test': rows})
-    return f'{rows}'
+    # rows = League.join(TeamLeague, League.c.idleague == TeamLeague.c.idleague).\
+    #     join(Team, TeamLeague.c.idteam == Team.c.idteam).select().execute().first()
 
+    # rows = engine.execute('select * from Test where id = 1').all()
+    # print({'test': rows})
+    # rows = Test.query.all()
+    # fs_mixin.fs_json_list(rows)
+    # return fs_mixin.fs_get_delete_put_post(rows)
+
+    # return {'test': data}
 
     # rows = Events.select(League.idleague, Events.strsport).join(Test1, League.idleague == Events.idleague)\
     #     .order_by(League.idleague).all()
@@ -76,8 +93,4 @@ def join():
     #     jdata.append(row)
 
 
-# with SessionContext() as session:
-#     query = session.query(Test, Test1, Test2)
-#     records = query.all()
-#     for test, test1, test2 in records:
-#         print(test, test1, test2)
+

@@ -1,7 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table
-
+from sqlalchemy import create_engine, MetaData, Table, String, Integer, Column, Text, DateTime, Boolean
+from flask_serialize import FlaskSerialize
 from . import db
 
+
+fs_mixin = FlaskSerialize(db)
 engine = create_engine('postgresql://dnv:dnv@localhost/dbsporttest', convert_unicode=True)
 metadata = MetaData(bind=engine)
 
@@ -9,9 +11,11 @@ Events = Table('events', metadata, autoload=True)
 League = Table('league', metadata, autoload=True)
 Team = Table('team', metadata, autoload=True)
 TeamLeague = Table('teamleague', metadata, autoload=True)
+Test = Table('test', metadata,
+             Column('testid', Integer()), autoload=True)
 
 
-# class Test(db.Model):
+# class Test(db.Model, fs_mixin):
 #     __tablename__ = 'test'
 #     id = db.Column(db.Integer(), primary_key=True)
 #     field1 = db.Column(db.VARCHAR())
