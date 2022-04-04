@@ -1,13 +1,11 @@
-import json
-
-import flask_restless
-from flask import request, Blueprint, jsonify
+from flask import Blueprint, jsonify
 from sqlalchemy import select
 
-from .models import Team, Events, League, db, TeamLeague, fs_mixin, Test, engine
+from .models import Team, Events, League, TeamLeague, Test1
 
 views = Blueprint('views', __name__)
-#
+
+
 # @views.route('/app', methods=['POST', 'GET'])
 # def test_getpost():
 #     if request.method == 'POST':
@@ -54,43 +52,33 @@ views = Blueprint('views', __name__)
 #         return {'message': 'Deleted'}
 
 
-@views.route('/join', methods=['GET'])
-def join():
-    # rows = db.session.query(Test.id, Test1.field1_1).join(Test1, Test.id == Test1.tid).order_by(Test.id).all()
-    # rows = Events.outerjoin(League).select(Events.c.idevent == 467795).execute().first()
-    # rows = Events.select(Events.c.idevent >= 1).execute().first()
-    rows = League.select().execute()
-    row = rows.fetchone()
-    print(row[League.c.idleague], row[1])
+# @views.route('/join', methods=['GET'])
+# def join():
+#     data = []
+#     rows = (select([League.c.strleague, Team.c.strteam])
+#             .select_from(League.join(TeamLeague, onclause=League.c.idleague == TeamLeague.c.idleague)
+#                          .join(Team, onclause=TeamLeague.c.idteam == Team.c.idteam))).execute()
+#     for row in rows:
+#         d = dict(row.items())
+#         data.append(d)
+#     return jsonify({'TeamsByLeague': data})
 
-    # rows = Events.join(League, onclause=Events.c.idleague == League.c.idleague). \
-    #     join(Team, onclause=Events.c.idhometeam == Team.c.idteam). \
-    #     select().\
-    #     execute()
+
+@views.route('/leagues', methods=['GET'])
+def get_leagues():
     data = []
-    for row in rows:
-        d = dict(row.items())
-        data.append(d)
-    # return '1'
-    return jsonify({League.name: data[:10]})
+    leagues = League.select().order_by(League.c.idleague).execute()
 
+    for league in leagues:
+        d_league = dict(league.items())
+        teams = Team.select()\
+            .join(TeamLeague, onclause=Team.c.idteam == TeamLeague.c.idteam)\
+            .where(league.idleague == TeamLeague.c.idleague).execute()
+        d_teams_in_league = []
+        for team in teams:
+            d_teams_in_league.append(dict(team.items()))
+        d_league['Teamsset'] = d_teams_in_league
+        data.append(d_league)
 
-    # rows = League.join(TeamLeague, League.c.idleague == TeamLeague.c.idleague).\
-    #     join(Team, TeamLeague.c.idteam == Team.c.idteam).select().execute().first()
-
-    # rows = engine.execute('select * from Test where id = 1').all()
-    # print({'test': rows})
-    # rows = Test.query.all()
-    # fs_mixin.fs_json_list(rows)
-    # return fs_mixin.fs_get_delete_put_post(rows)
-
-    # return {'test': data}
-
-    # rows = Events.select(League.idleague, Events.strsport).join(Test1, League.idleague == Events.idleague)\
-    #     .order_by(League.idleague).all()
-    # jdata = []
-    # for row in rows:
-    #     jdata.append(row)
-
-
-
+    # return jsonify({'Leagues': data[:5]})
+    return jsonify(data[:5])

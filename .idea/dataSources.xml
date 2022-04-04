@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="test_dnv" uuid="4c883fd4-7894-446c-98ee-15423c5d418c">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/test_dnv</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
     <data-source source="LOCAL" name="dbsporttest@localhost" uuid="fb180a0e-deea-4209-9661-e50c404d0fa9">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
